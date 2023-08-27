@@ -12,5 +12,4 @@ Uppgiften är att skriva ett program som parsar CSV filen och sedan ger använda
 
 # Fördjupning -- JSON data
 
-Om ni är klara med det grundläggande programmet och har tid över kan ni försöka er på en svårare fördjupningsuppgift. Filen hard-mode/advanced.json innehåller en JSON data om alla vapen från From Software spelet Dark Souls. Programmet ska kunna visa en lista på alla vapen och ge djupare information om varje vapen om man väljer att inspektera det närmare. Eftersom de är en fördjupningsuppgift väljer du själv hur mycket av datan du vill tolka och visa.
-Ett tips som kan hjälpa de som vill pröva att göra den här uppgiften är att JSON-datan innehåller en massor av tecken som vi egentligen kan hoppa över därför att vi inte bryr oss om i C. 
+Om ni är klara med det grundläggande programmet och har tid över kan ni försöka er på en svårare fördjupningsuppgift. Filen hard-mode/advanced.json innehåller en JSON data om alla vapen från From Software spelet Dark Souls. Programmet ska kunna visa en lista på alla vapen och ge djupare information om varje vapen om man väljer att inspektera det närmare. Eftersom de är en fördjupningsuppgift väljer du själv hur mycket av datan du vill tolka och visa. Good luck, traveller!
