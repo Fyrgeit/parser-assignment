@@ -13,6 +13,11 @@ typedef struct relation {
     int weight;
 } relation;
 
+typedef struct target_relation {
+    char person[LETTERS];
+    int weight;
+} target_relation;
+
 relation read_relation(FILE *file_ptr) {
     relation curr_relation;
     
@@ -101,17 +106,73 @@ void add_best_name(int i, int count, char original_names[][LETTERS], char sorted
     set_str(original_names[best_i], "-empty-");
 }
 
-void list(char names[][LETTERS], int name_count, relation relations[]) {
+void add_best_relation(int i, int count, target_relation original_rels[], target_relation sorted_rels[]) {
+    int prev_weight = 256;
+    if (i > 0) prev_weight = sorted_rels[i - 1].weight;
+
+    int best_weight = -256;
+    int best_i;
+
+    for (int i = 0; i < count; i++)
+    {
+        if (strcmp(original_rels[i].person, "-empty-") == 0) continue;
+        
+        if (original_rels[i].weight > best_weight) {
+            best_weight = original_rels[i].weight;
+            best_i = i;
+        }
+    }
+    
+    sorted_rels[i] = original_rels[best_i];
+    set_str(original_rels[best_i].person, "-empty-");
+}
+
+void list(char names[][LETTERS], int name_count, relation relations[], bool show_rels) {
     for (int i = 0; i < name_count; i++)
     {
         printf("%i: %s\n", i, names[i]);
+        if (!show_rels) continue;
 
-        //Prints relations
+        //Handle relations
+        target_relation rels[64];
+        int rel_count = 0;
+
         for (int n = 0; n < COUNT; n++)
         {
             if (strcmp(relations[n].source, names[i]) != 0) continue;
 
-            printf("\t%s: %i\n", relations[n].target, relations[n].weight);
+            target_relation rel;
+            set_str(rel.person, relations[n].target); 
+            rel.weight = relations[n].weight;
+
+            rels[rel_count] = rel;
+            rel_count++;
+        }
+
+        for (int n = 0; n < COUNT; n++)
+        {
+            if (strcmp(relations[n].target, names[i]) != 0) continue;
+
+            target_relation rel;
+            set_str(rel.person, relations[n].source); 
+            rel.weight = relations[n].weight;
+
+            rels[rel_count] = rel;
+            rel_count++;
+        }
+
+        //Sort relations
+        target_relation sorted_rels[rel_count];
+
+        for (int i = 0; i < rel_count; i++)
+        {
+            add_best_relation(i, rel_count, rels, sorted_rels);
+        }
+
+        //Print relations
+        for (int i = 0; i < rel_count; i++)
+        {
+            printf("\t%s: %i\n", sorted_rels[i].person, sorted_rels[i].weight);
         }
     }
 }
@@ -126,18 +187,6 @@ int main() {
     {
         relations[i] = read_relation(fptr);
     }
-
-    //Output
-    /* for (int i = 0; i < 353; i++)
-    {
-        printf(
-            "%i: %s, %s, %i\n",
-            i,
-            relations[i].source,
-            relations[i].target,
-            relations[i].weight
-        );
-    } */
 
     //Put all names in array
     char names[128][LETTERS];
@@ -182,12 +231,17 @@ int main() {
         switch (input)
         {
         case 'L':
-            list(sorted_names, name_count, relations);
+            clear();
+            list(sorted_names, name_count, relations, false);
             puts("Press any letter + enter to continue");
             scanf(" ");
             break;
         case 'R':
-            
+            clear();
+            list(sorted_names, name_count, relations, true);
+            puts("Press any letter + enter to continue");
+            scanf(" ");
+            break;
             break;
         case 'Q':
             loop = false;
