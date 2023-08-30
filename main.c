@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define clear() printf("\033[H\033[J")
 #define LETTERS 15
@@ -50,23 +51,10 @@ relation read_relation(FILE *file_ptr) {
     return curr_relation;
 }
 
-bool comp_str(char str1[LETTERS], char str2[LETTERS]) {
-    for (int i = 0; i < LETTERS; i++)
-    {
-        if (str1[i] != str2[i]) {
-            return false;
-        } else if (str1[i] == '\0' && str2[i] == '\0') {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
 bool contains(char str[], char names[][LETTERS], int name_count) {
     for (int i = 0; i < name_count; i++)
     {
-        if (comp_str(str, names[i])) {
+        if (strcmp(str, names[i]) == 0) {
             return true;
         }
     }
@@ -84,10 +72,47 @@ void add_str(char str[], char names[][LETTERS], int *name_count) {
     (*name_count)++;
 }
 
-void list(char names[][LETTERS], int name_count) {
+void set_str(char target[], char source[]) {
+    for (int i = 0; i < LETTERS; i++)
+    {
+        target[i] = source[i];
+    }
+}
+
+//Adds the alphabetically first name from original_names to sorted_names, marks the added name as empty
+void add_best_name(int i, int count, char original_names[][LETTERS], char sorted_names[][LETTERS]) {
+    char prev_name[LETTERS] = "@";
+    if (i > 0) set_str(prev_name, sorted_names[i - 1]);
+
+    char best_name[LETTERS] = "|bad|";
+    int best_i;
+
+    for (int i = 0; i < count; i++)
+    {
+        if (strcmp(original_names[i], "-empty-") == 0) continue;
+        
+        if (strcmp(original_names[i], best_name) < 0) {
+            set_str(best_name, original_names[i]);
+            best_i = i;
+        }
+    }
+    
+    set_str(sorted_names[i], best_name);
+    set_str(original_names[best_i], "-empty-");
+}
+
+void list(char names[][LETTERS], int name_count, relation relations[]) {
     for (int i = 0; i < name_count; i++)
     {
         printf("%i: %s\n", i, names[i]);
+
+        //Prints relations
+        for (int n = 0; n < COUNT; n++)
+        {
+            if (strcmp(relations[n].source, names[i]) != 0) continue;
+
+            printf("\t%s: %i\n", relations[n].target, relations[n].weight);
+        }
     }
 }
 
@@ -131,6 +156,14 @@ int main() {
         }
     }
 
+    char sorted_names[name_count][LETTERS];
+
+    for (int i = 0; i < name_count; i++)
+    {
+        add_best_name(i, name_count, names, sorted_names);
+    }
+    
+
     //Input
     bool loop = true;
 
@@ -149,7 +182,7 @@ int main() {
         switch (input)
         {
         case 'L':
-            list(names, name_count);
+            list(sorted_names, name_count, relations);
             puts("Press any letter + enter to continue");
             scanf(" ");
             break;
