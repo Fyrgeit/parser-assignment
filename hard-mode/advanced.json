@@ -2,7 +2,7 @@
     {
         "name": "Dagger",
         "atk": {
-            "physical": 56,
+            "physical": 56, 
             "magic": 0,
             "fire": 0,
             "lightning": 0,
